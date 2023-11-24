@@ -125,6 +125,19 @@ public class HelloWorldServer {
     @Override
     public void postRequestRpc(PostRequest req, StreamObserver<PostResponse> responseObserver) {
       System.out.println("In:");
+      ManagedChannel channel = ManagedChannelBuilder.forAddress("192.168.29.152", 50054)
+              .usePlaintext()
+              .build();
+
+      GreeterDownStreamGrpc.GreeterDownStreamBlockingStub blockingStub = GreeterDownStreamGrpc.newBlockingStub(channel);
+
+      PostRequest request = PostRequest.newBuilder()
+              // Set request fields
+              .setMsg(req.getMsg())
+              .build();
+
+      PostResponse response = blockingStub.postRequestRpc(request);
+      channel.shutdown();
       responseObserver.onNext(PostResponse.newBuilder().setResponseMsg(req.getMsg()).build());
       responseObserver.onCompleted();
     }
